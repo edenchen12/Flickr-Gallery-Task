@@ -1,0 +1,78 @@
+//
+//  DetailViewController.swift
+//  Flickr Gallery Task
+//
+//  Created by Eden Chen on 30/11/2021.
+//toPopoverView
+
+import UIKit
+
+class DetailViewController: UIViewController {
+
+	@IBOutlet weak var imageView: UIImageView!
+	@IBOutlet weak var xButton: UIButton!
+	
+	let activityIndicator = UIActivityIndicatorView(style: .whiteLarge)
+
+	var selectedPhoto: PhotoModel?
+	override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Do any additional setup after loading the view.
+		guard let safeSelectedPhoto = selectedPhoto else {return}
+		downloadImage(from: safeSelectedPhoto)
+
+		if self.traitCollection.userInterfaceStyle == .dark {
+			xButton.tintColor = .white
+		} else {
+			xButton.tintColor = .black
+		}
+		
+	}
+    
+	@IBAction func xButtonTapped(_ sender: UIButton) {
+		dismiss(animated: true, completion: nil)
+	}
+	
+	func downloadImage(from photo: PhotoModel) {
+		activityIndicator.hidesWhenStopped = true
+		activityIndicator.center = self.view.center
+		activityIndicator.color = .gray
+		activityIndicator.startAnimating()
+		view.addSubview(activityIndicator)
+		
+		let stringUrl =  "https://live.staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_n.jpg"
+		guard let url = URL(string: stringUrl) else { return }
+	
+		let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+			 
+			guard let self = self else {return}
+			if error != nil {return}
+			
+			guard let response = response as? HTTPURLResponse, response.statusCode == 200 else { return	}
+			
+			guard let data = data else { return }
+			
+			guard let image = UIImage(data: data) else { return }
+			
+			DispatchQueue.main.async {
+				self.imageView.image = image
+				self.activityIndicator.stopAnimating()
+			}
+
+		}
+		task.resume()
+	}
+
+
+    /*
+    // MARK: - Navigation
+
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // Get the new view controller using segue.destination.
+        // Pass the selected object to the new view controller.
+    }
+    */
+
+}
