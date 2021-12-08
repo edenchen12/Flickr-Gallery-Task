@@ -11,14 +11,14 @@ class NetworkManager {
 	
 	static let shared = NetworkManager()
 	
-	private let API_Key = "YOUR_API"
+	private let API_Key = "aabca25d8cd75f676d3a74a72dcebf21"
 	private let photosUrl = "https://www.flickr.com/services/rest/?method=flickr.photos.getRecent&extras=url_sq&format=json&nojsoncallback=1&api_key="
 	private let pageUrl = "&page="
 	
 	let cache = NSCache<NSString, UIImage>()
 
 	func getPhotos(page: Int, completed: @escaping (Result<[PhotoModel], FGError>) -> Void) {
-		guard let url = URL(string: photosUrl + APIManager.API_Key + pageUrl + "\(page)") else {
+		guard let url = URL(string: photosUrl + API_Key + pageUrl + "\(page)") else {
 			completed(.failure(.invalidURL))
 			return
 		}
